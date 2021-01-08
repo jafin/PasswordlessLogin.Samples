@@ -9,11 +9,12 @@ First clone this repo and select a sample project and open it in Visual Studio o
 ### Database ###
 
 1. Create a SQL Server database and initialize the schema with [this script](
-https://raw.githubusercontent.com/SimpleIAM/PasswordlessLogin/master/PasswordlessLogin.Migrations/UpgradePasswordlessLogin.SqlServer.sql)
+https://raw.githubusercontent.com/SimpleIAM/PasswordlessLogin/master/PasswordlessLogin.SqlServer/UpgradePasswordlessLogin.SqlServer.sql)
+
 
 2. Update your connection string as necessary. To do this in Visual Studio, right click on the project, select *Manage User Secrets*, and add something like this to your local secrets file (adjust for your db server and database name)
 
-```
+```json
 {
   "ConnectionStrings": {
     "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=PasswordlessDemo;Trusted_Connection=True;MultipleActiveResultSets=true"
@@ -32,7 +33,7 @@ The authentication system requires certain security cookies that must be set ove
 
 To use the Kestrel server with SSL, edit launchSettings.json (nested under Properties in the Solution Explorer). Add a Kestrel entry to the profiles section:
 
-```
+```json
 {
   ...
   "profiles": {
