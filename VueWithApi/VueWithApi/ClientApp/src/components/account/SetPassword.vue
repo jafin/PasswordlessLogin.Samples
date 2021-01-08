@@ -27,7 +27,7 @@
 <script>
     import Vue from 'vue';
     import { mapGetters } from 'vuex';
-    import api from '../../api.js';
+    import api from '../../api';
     import PasswordStrengthMeter from './PasswordStrengthMeter.vue';
 
     export default Vue.extend({

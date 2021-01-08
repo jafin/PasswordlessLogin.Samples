@@ -1,7 +1,7 @@
 ﻿import Vue from 'vue'
 import App from './components/app/App.vue'
-import store from './store.js';
-import router from './router.js';
+import store from './store';
+import router from './router';
 
 store.dispatch('initialize').then(() => {
 

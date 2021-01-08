@@ -17,7 +17,7 @@ namespace VueWithApi.Controllers
         [HttpGet("signin/{longCode}")]
         public async Task<IActionResult> SignInLink(string longCode)
         {
-            var response = await _authenticateOrchestrator.AuthenticateLongCodeAsync(longCode);
+            var response = await _authenticateOrchestrator.AuthenticateLongCodeAsync(longCode).ConfigureAwait(false);
             switch (response.StatusCode)
             {
                 case HttpStatusCode.Redirect:

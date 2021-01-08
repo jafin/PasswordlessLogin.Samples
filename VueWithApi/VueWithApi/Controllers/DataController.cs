@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VueWithApi.Models;
@@ -18,14 +15,14 @@ namespace VueWithApi.Controllers
             return new AppInfo() {
                 MinimumPasswordLength = 8,
                 MinimumPasswordStrength = 30,
-                User = new UserInfo() {
+                User = new UserInfo {
                     IsAuthenticated = User.Identity.IsAuthenticated,
                     Email = User.Identity.Name ?? "-",
                     Username = User.Identity.Name ?? "anon",
                 },
                 Permissions = User.Identity.IsAuthenticated ?
                     new[] { "view-profile", "set-password" } :
-                    new string[] { }
+                    Array.Empty<string>()
             };
         }
 

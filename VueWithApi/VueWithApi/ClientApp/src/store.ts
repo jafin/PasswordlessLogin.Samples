@@ -1,6 +1,6 @@
 ﻿import Vue from 'vue';
 import Vuex from 'vuex';
-import api from './api.js';
+import api from './api';
 
 Vue.use(Vuex);
 
@@ -10,7 +10,7 @@ export default new Vuex.Store({
         initialized: false,
         minimumPasswordStrength: 30,
         minimumPasswordLength: 8,
-        permissions: [],
+        permissions: Array<string>(),
         user: {
             username: '?',
             email: '?',
@@ -29,7 +29,7 @@ export default new Vuex.Store({
     },
     actions: {
         initialize(context) {
-            return new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
                 api.getAppInfo().then(data => {
                     context.commit('setAppInfo', data);
                     resolve();

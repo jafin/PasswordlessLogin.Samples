@@ -39,7 +39,7 @@
 
 <script>
     import Vue from 'vue';
-    import api from '../../api.js';
+    import api from '../../api';
 
     export default {
         props: ['nextUrl'],

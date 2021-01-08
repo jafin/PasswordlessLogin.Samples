@@ -4,22 +4,29 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SpaServices;
 using Microsoft.AspNetCore.SpaServices.Webpack;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SimpleIAM.PasswordlessLogin.Configuration;
+using SimpleIAM.PasswordlessLogin.Entities;
+using SimpleIAM.PasswordlessLogin.SqlServer;
 using Swashbuckle.AspNetCore.Swagger;
+using VueCliMiddleware;
 
 namespace VueWithApi
 {
     public class Startup
     {
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
             _env = env;
@@ -33,58 +40,109 @@ namespace VueWithApi
             // If you need to customize the functionality of the Passwordless module
             // you can register custom services for sending mail, hashing password, etc. here
 
-            services.AddPasswordlessLogin(Configuration, _env);
+            var builder = services.AddPasswordlessLogin(Configuration);
+            builder.AddPasswordlessLoginAPI();
+            
+            //TODO: Configure the SqlBackingStore.
+            //var optionsBuilder = new DbContextOptionsBuilder<PasswordlessLoginDbContext>();
+            //var config = new SqlServerPasswordlessDatabaseConfig();
+            //builder.AddSqlServer(, new SqlServerPasswordlessDatabaseConfig());
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc(options => options.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             if (_env.IsDevelopment())
             {
-                services.AddSwaggerGen(c =>
-                {
-                    c.SwaggerDoc("v1", new Info { Title = "API", Version = "v1" });
-                });
+                //TODO: Fix for net core 3.1
+                // services.AddSwaggerGen(c =>
+                // {
+                //     c.SwaggerDoc("v1", new Info { Title = "API", Version = "v1" });
+                // });
             }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
+            _ = CommandLine.Arguments.TryGetOptions(System.Environment.GetCommandLineArgs(), false, out string mode, out ushort port, out bool https);
 
-                // Webpack initialization with hot-reload.
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+            // if (env.IsDevelopment())
+            // {
+            //     app.UseDeveloperExceptionPage();
+            //
+            //     // Webpack initialization with hot-reload.
+            //     app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+            //     {
+            //         HotModuleReplacement = true,
+            //         EnvParam = "development"
+            //     });
+            // }
+            // else
+            // {
+            //     app.UseHsts();
+            // }
+
+            //app.UseStaticFiles(); //included in usePasswordlessLogin?
+            
+            if (!env.IsDevelopment())
+            {
+                app.UseSpaStaticFiles();
+            }
+
+            //app.UseRouting(); //included in usePasswordlessLogin?
+            app.UsePasswordlessLoginAPI(env.WebRootFileProvider);
+            app.UsePasswordlessLogin(env.WebRootFileProvider); //order of this seems important, after route, before UseEndpoints?.
+            //app.UseAuthorization(); //must occur before UseEndpoints, after UseRouting  https://docs.microsoft.com/en-us/aspnet/core/migration/22-to-30?view=aspnetcore-5.0&tabs=visual-studio
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
+
+                if (env.IsDevelopment())
                 {
-                    HotModuleReplacement = true,
-                    EnvParam = "development"
-                });
-            }
-            else
-            {
-                app.UseHsts();
-            }
+                    app.UseDeveloperExceptionPage();
 
-            app.UseHttpsRedirection();
-
-            if (env.IsDevelopment())
-            {
-                // visit /swagger/ to explore and interact with the API
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
+                    // This forwards everything to the "vue-cli-service":
+                    endpoints.MapToVueCliProxy(
+                        "{*path}",
+                        new SpaOptions { SourcePath = "ClientApp" },
+                        npmScript: "serve",
+                        regex: "Compiled successfully");
+                }
+                else
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
-                });
-            }
-
-            app.UsePasswordlessLogin(env.WebRootFileProvider);
-
-            app.UseMvc(routes =>
-            {
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
+                    app.UseHsts();
+                }
             });
+
+
+            //app.UseHttpsRedirection();
+
+            // if (env.IsDevelopment())
+            // {
+            //     // visit /swagger/ to explore and interact with the API
+            //     app.UseSwagger();
+            //     app.UseSwaggerUI(c =>
+            //     {
+            //         c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+            //     });
+            // }
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+            });
+
+            
+
+            //TODO: Still required?
+            // app.UseMvc(routes =>
+            // {
+            //     routes.MapSpaFallbackRoute(
+            //         name: "spa-fallback",
+            //         defaults: new { controller = "Home", action = "Index" });
+            // });
         }
     }
 }
