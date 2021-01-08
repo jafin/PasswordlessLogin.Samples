@@ -23,8 +23,8 @@ namespace VueWithApi.Controllers
                     Email = User.Identity.Name ?? "-",
                     Username = User.Identity.Name ?? "anon",
                 },
-                Permissions = User.Identity.IsAuthenticated ? 
-                    new[] { "view-profile", "set-password" } : 
+                Permissions = User.Identity.IsAuthenticated ?
+                    new[] { "view-profile", "set-password" } :
                     new string[] { }
             };
         }
