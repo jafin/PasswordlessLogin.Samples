@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SimpleIAM.PasswordlessLogin;
 using SimpleIAM.PasswordlessLogin.Configuration;
 using SimpleIAM.PasswordlessLogin.Entities;
 using SimpleIAM.PasswordlessLogin.SqlServer;
@@ -40,13 +41,39 @@ namespace VueWithApi
             // If you need to customize the functionality of the Passwordless module
             // you can register custom services for sending mail, hashing password, etc. here
 
-            var builder = services.AddPasswordlessLogin(Configuration);
+            //var builder = services.AddPasswordlessLogin(Configuration);
+            var builder = services.AddPasswordlessLogin();
             builder.AddPasswordlessLoginAPI();
-            
+            builder.AddSmtpEmail(options =>
+            {
+                options.Port = 25;
+                options.Server = "localhost";
+                options.UseSsl = false;
+                options.UseAuthentication = false;
+            });
+
+            builder.AddAuth();
+
             //TODO: Configure the SqlBackingStore.
+
             //var optionsBuilder = new DbContextOptionsBuilder<PasswordlessLoginDbContext>();
             //var config = new SqlServerPasswordlessDatabaseConfig();
-            //builder.AddSqlServer(, new SqlServerPasswordlessDatabaseConfig());
+            //builder.AddSqlServer(options => {}, new SqlServerPasswordlessDatabaseConfig());
+
+            //var databaseConfig = new PasswordlessDatabaseConfig();
+            //Configuration.Bind(PasswordlessLoginConstants.ConfigurationSections.PasswordlessDatabase, databaseConfig);
+            var connection = Configuration.GetConnectionString(PasswordlessLoginConstants.ConfigurationSections.ConnectionStringName);
+            //services.AddDbContext<PasswordlessLoginDbContext>(options => options.UseSqlServer(connection));
+
+            // services.AddDbContext<SqlServerPasswordlessLoginDbContext>(options =>
+            // {
+            //     options.UseSqlServer(connection);
+            // });
+
+            builder.AddSqlServer(options =>
+            {
+                options.UseSqlServer(connection);
+            });
 
             services.AddMvc(options => options.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Latest);
 
@@ -91,7 +118,7 @@ namespace VueWithApi
             //app.UseRouting(); //included in usePasswordlessLogin?
             app.UsePasswordlessLoginAPI(env.WebRootFileProvider);
             app.UsePasswordlessLogin(env.WebRootFileProvider); //order of this seems important, after route, before UseEndpoints?.
-            //app.UseAuthorization(); //must occur before UseEndpoints, after UseRouting  https://docs.microsoft.com/en-us/aspnet/core/migration/22-to-30?view=aspnetcore-5.0&tabs=visual-studio
+            app.UseAuthorization(); //must occur before UseEndpoints, after UseRouting  https://docs.microsoft.com/en-us/aspnet/core/migration/22-to-30?view=aspnetcore-5.0&tabs=visual-studio
 
             app.UseEndpoints(endpoints =>
             {

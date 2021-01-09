@@ -6,7 +6,7 @@
         Loading...
     </div>
     <div v-else id="app" class="app">
-        <h1>Vue App</h1>
+        <h1>SimpleIAM Passwordless Example</h1>
         <div class="menu">
             <router-link to="/">Home</router-link>
             <router-link v-if="canViewProfile" to="/myaccount">My Account</router-link>
@@ -39,6 +39,8 @@
 </script>
 
 <style lang="scss">
+@import '../../assets/css/site.css';
+
     .app {
         max-width: 900px;
         margin: 0 auto;
