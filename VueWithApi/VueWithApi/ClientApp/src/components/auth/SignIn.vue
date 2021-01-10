@@ -177,7 +177,7 @@
                 if (this.signInEnabled) {
                     let oneTimeCode = this.password.replace(' ', '');
                     if (this.signInType == 'code' || /^[0-9]{6}$/.test(oneTimeCode)) {
-                        api.authenticate(this.username, oneTimeCode, this.trustThisDevice)
+                        api.authenticateOneTimeCode(this.username, oneTimeCode, this.trustThisDevice)
                             .then(data => this.signInDone(data))
                             .catch(error => this.signInFailed(error));
                     }

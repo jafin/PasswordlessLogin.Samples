@@ -18,13 +18,19 @@ const api = {
     register(email: any, nextUrl: any) {
         return this.enhancePromise(url.post('/passwordless-api/v1/register', { email, nextUrl }));
     },
-    sendOneTimeCode(username: any, nextUrl: any) {
+    sendOneTimeCode(username: string, nextUrl: any) {
         return this.enhancePromise(url.post('/passwordless-api/v1/send-one-time-code', { username, nextUrl }));
     },
-    authenticate(username: any, oneTimeCode: any, staySignedIn: any) {
+    
+    authenticate(username: string, oneTimeCode: string, staySignedIn: boolean) {
         return this.enhancePromise(url.post('/passwordless-api/v1/authenticate', { username, oneTimeCode, staySignedIn }), false);
     },
-    authenticatePassword(username: any, password: any, staySignedIn: any, nextUrl: any) {
+
+    authenticateOneTimeCode(username: string, oneTimeCode: string, staySignedIn: boolean) {
+        return this.enhancePromise(url.post('/passwordless-api/v1/authenticate-one-time-code', { username, oneTimeCode, staySignedIn }), false);
+    },
+
+    authenticatePassword(username: string, password: string, staySignedIn: boolean, nextUrl: any) {
         return this.enhancePromise(url.post('/passwordless-api/v1/authenticate-password', { username, password, staySignedIn, nextUrl }), false);
     },
     authenticateLink(longCode: any) {
@@ -33,10 +39,10 @@ const api = {
     signOut() {
         return this.enhancePromise(url.post('/passwordless-api/v1/sign-out'));
     },
-    sendPasswordResetMessage(username: any, nextUrl: any) {
+    sendPasswordResetMessage(username: string, nextUrl: any) {
         return this.enhancePromise(url.post('/passwordless-api/v1/send-password-reset-message', { username, nextUrl }));
     },
-    setPassword(newPassword: any) {
+    setPassword(newPassword: string) {
         return this.enhancePromise(url.post('/passwordless-api/v1/my-account/set-password', { newPassword }));
     },
     enhancePromise(apiPromise: Promise<any>, redirectUnauthenticated = true) {
