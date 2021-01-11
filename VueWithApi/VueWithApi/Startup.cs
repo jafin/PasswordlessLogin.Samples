@@ -8,13 +8,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using SimpleIAM.PasswordlessLogin;
-using VueCliMiddleware;
+//using VueCliMiddleware;
 
 namespace VueWithApi
 {
     public class Startup
     {
         private readonly IWebHostEnvironment _env;
+        private string _CORSPolicy = "DevPolicy";
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
@@ -41,6 +42,19 @@ namespace VueWithApi
 
             builder.AddAuth();
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy(_CORSPolicy,
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost",
+                            "https://localhost",
+                            "https://localhost:3000",
+                            "http://localhost:3000"
+                            );
+                    });
+            });
+
             var connection =
                 Configuration.GetConnectionString(PasswordlessLoginConstants.ConfigurationSections
                     .ConnectionStringName);
@@ -58,10 +72,14 @@ namespace VueWithApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            const bool useVue = false;
+
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles();
             }
+
+            app.UseCors(_CORSPolicy);
 
             app.UsePasswordlessLoginAPI(env.WebRootFileProvider);
             app.UsePasswordlessLogin(env
@@ -78,12 +96,17 @@ namespace VueWithApi
                 {
                     app.UseDeveloperExceptionPage();
 
+                   
+
                     // This forwards everything to the "vue-cli-service":
-                    endpoints.MapToVueCliProxy(
-                        "{*path}",
-                        new SpaOptions {SourcePath = "ClientApp"},
-                        npmScript: "serve",
-                        regex: "Compiled successfully");
+                    if (useVue)
+                    {
+                        // endpoints.MapToVueCliProxy(
+                        //     "{*path}",
+                        //     new SpaOptions {SourcePath = "ClientApp"},
+                        //     npmScript: "serve",
+                        //     regex: "Compiled successfully");
+                    }
 
                     app.UseSwagger();
                     app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1"); });
