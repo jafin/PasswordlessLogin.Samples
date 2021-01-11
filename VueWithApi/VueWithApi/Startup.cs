@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.SpaServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using SimpleIAM.PasswordlessLogin;
-using Swashbuckle.AspNetCore.Swagger;
 using VueCliMiddleware;
 
 namespace VueWithApi
@@ -41,55 +41,31 @@ namespace VueWithApi
 
             builder.AddAuth();
 
-            var connection = Configuration.GetConnectionString(PasswordlessLoginConstants.ConfigurationSections.ConnectionStringName);
-            builder.AddSqlServer(options =>
-            {
-                options.UseSqlServer(connection);
-            });
+            var connection =
+                Configuration.GetConnectionString(PasswordlessLoginConstants.ConfigurationSections
+                    .ConnectionStringName);
+            builder.AddSqlServer(options => { options.UseSqlServer(connection); });
 
-            services.AddMvc(options => options.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddMvc(options => options.EnableEndpointRouting = false)
+                .SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             if (_env.IsDevelopment())
             {
-                //TODO: Fix for net core 3.1
-                // services.AddSwaggerGen(c =>
-                // {
-                //     c.SwaggerDoc("v1", new Info { Title = "API", Version = "v1" });
-                // });
+                services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "API", Version = "v1"}); });
             }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            _ = CommandLine.Arguments.TryGetOptions(System.Environment.GetCommandLineArgs(), false, out string mode, out ushort port, out bool https);
-
-            // if (env.IsDevelopment())
-            // {
-            //     app.UseDeveloperExceptionPage();
-            //
-            //     // Webpack initialization with hot-reload.
-            //     app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-            //     {
-            //         HotModuleReplacement = true,
-            //         EnvParam = "development"
-            //     });
-            // }
-            // else
-            // {
-            //     app.UseHsts();
-            // }
-
-            //app.UseStaticFiles(); //included in usePasswordlessLogin?
-            
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles();
             }
 
-            //app.UseRouting(); //included in usePasswordlessLogin?
             app.UsePasswordlessLoginAPI(env.WebRootFileProvider);
-            app.UsePasswordlessLogin(env.WebRootFileProvider); //order of this seems important, after route, before UseEndpoints?.
+            app.UsePasswordlessLogin(env
+                .WebRootFileProvider); //order of this seems important, after route, before UseEndpoints?.  Includes UseRouting()
             app.UseAuthorization(); //must occur before UseEndpoints, after UseRouting  https://docs.microsoft.com/en-us/aspnet/core/migration/22-to-30?view=aspnetcore-5.0&tabs=visual-studio
 
             app.UseEndpoints(endpoints =>
@@ -105,9 +81,12 @@ namespace VueWithApi
                     // This forwards everything to the "vue-cli-service":
                     endpoints.MapToVueCliProxy(
                         "{*path}",
-                        new SpaOptions { SourcePath = "ClientApp" },
+                        new SpaOptions {SourcePath = "ClientApp"},
                         npmScript: "serve",
                         regex: "Compiled successfully");
+
+                    app.UseSwagger();
+                    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1"); });
                 }
                 else
                 {
@@ -118,30 +97,7 @@ namespace VueWithApi
 
             //app.UseHttpsRedirection();
 
-            // if (env.IsDevelopment())
-            // {
-            //     // visit /swagger/ to explore and interact with the API
-            //     app.UseSwagger();
-            //     app.UseSwaggerUI(c =>
-            //     {
-            //         c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
-            //     });
-            // }
-
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
-            });
-
-            
-
-            //TODO: Still required?
-            // app.UseMvc(routes =>
-            // {
-            //     routes.MapSpaFallbackRoute(
-            //         name: "spa-fallback",
-            //         defaults: new { controller = "Home", action = "Index" });
-            // });
+            app.UseSpa(spa => { spa.Options.SourcePath = "ClientApp"; });
         }
     }
 }

@@ -261,3 +261,9 @@ __pycache__/
 *.pyc
 
 VueWithApi/VueWithApi/wwwroot/build
+/VueWithApi/VueWithApi/ClientApp/src/api.js
+/VueWithApi/VueWithApi/ClientApp/src/api.js.map
+/VueWithApi/VueWithApi/ClientApp/src/main.js
+/VueWithApi/VueWithApi/ClientApp/src/router.js
+/VueWithApi/VueWithApi/ClientApp/src/store.js
+/VueWithApi/VueWithApi/ClientApp/src/api.js.map
