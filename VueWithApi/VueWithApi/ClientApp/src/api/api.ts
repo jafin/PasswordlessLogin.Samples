@@ -4,7 +4,8 @@ import { AppInfo } from './generated/api';
 
 const url = axios.create({
     //baseURL: window.location.origin
-    baseURL: 'https://localhost:5001'  //todo: unhard code.
+    baseURL: 'https://localhost:5001',  //todo: unhard code.
+    withCredentials: true  //assist with setting cookie in proxied CORS scenario.
 });
 
 const api = {

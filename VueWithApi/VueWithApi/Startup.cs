@@ -51,7 +51,8 @@ namespace VueWithApi
                             "https://localhost",
                             "https://localhost:3000",
                             "http://localhost:3000"
-                            ).AllowAnyHeader()
+                            ).AllowCredentials() //allow sending auth cookies cross origin (assist in dev proxy mode)
+                            .AllowAnyHeader()
                             .AllowAnyMethod();
                     });
             });

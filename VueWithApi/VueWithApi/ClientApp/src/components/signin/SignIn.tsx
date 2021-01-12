@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import api from "../../api/api";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import { useStore } from '../../store';
 
 export function SignIn() {
   const [usernameError, setusernameError] = useState("");
@@ -12,8 +14,34 @@ export function SignIn() {
   const [trustThisDevice, setTrustThisDevice] = useState<boolean>(false);
   const [signInEnabled, setSignInEnabled] = useState<boolean>(true);
   const [signInType, setSignInType] = useState<string>('');
+  
+  //these are props.
   const [nextUrl, setNextUrl] = useState<string>('');
-  const [idPrefix, setIdPrefix] = useState<string>(''); //todo this is a prop is original code.
+  const [idPrefix, setIdPrefix] = useState<string>(''); 
+  const [loginHint, setLoginHint] = useState<string>('');
+  let history = useHistory();
+
+  //refs
+  const passwordEl = useRef(null);
+  const usernameEl= useRef(null);
+
+  const store = useStore();
+
+  const [cookies, setCookie, removeCookie] = useCookies(['name']);
+
+  useEffect(()=> {
+    loadSavedUsernames();
+            if (loginHint) {
+                setUsername(this.loginHint);
+                passwordEl.current.focus();
+            }
+            else {
+                usernameEl.current.focus();
+                //this.$refs.username.focus();
+                };
+  },[])
+  
+
   const submitForm = function (evt:React.FormEvent<HTMLFormElement>): void {
       evt.preventDefault();
     setMessage("Please wait...");
@@ -23,6 +51,21 @@ export function SignIn() {
     else {
         getOneTimeCode();
     }
+}
+
+const loadSavedUsernames = function() {
+  setSavedUsernames([]);
+  const usernames = cookies['SavedUsernames'];
+  if (typeof usernames == 'string') {
+      let count = 0;
+      usernames.split(' ').forEach(name => {
+          count++;
+          if (count <= 3 && name.length > 1 && name.length <= 100) {
+              setSavedUsernames([...savedUsernames, name])
+              //this.savedUsernames.push(name);
+          }
+      });
+  }
 }
 
 const showSavedUsernames = function() {
@@ -37,11 +80,16 @@ const getId = function(name) {
     return prefix + name;
 }
 
+const selectUsername = function(name) {
+  setUsername(name);
+  passwordEl.current.focus()
+}
+
 const getOneTimeCode = function () {
     api.sendOneTimeCode(username, nextUrl)
         .then(data => {
             setMessage('We sent sent a one time code to your email');
-                this.$refs.password.focus();
+            passwordEl.current.focus();
         })
         .catch(error => {
             if (error.message) {
@@ -71,12 +119,20 @@ const signIn = function () {
 
 const signInDone = function (data) {
     saveUsernames();
-    this.$store.dispatch('initialize').then(() => {
+    store.initialize();
+    // this.$store.dispatch('initialize').then(() => {
         if (typeof data.nextUrl === 'string') {
-            this.$router.push(data.nextUrl);
+            history.push(data.nextUrl);
+            //this.$router.push(data.nextUrl);
         }
-    });
+    // });
 }
+
+function addDays(date: Date, days: number): Date {
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
 const signInFailed = function (error) {
     console.log(error);
     if (typeof error.response.status !== 'undefined' && error.response.status === 401) {
@@ -91,15 +147,15 @@ function saveUsernames() {
         if (username.length <= 100) {
             usernames.unshift(username);
         }
-        this.$cookie.set('SavedUsernames', usernames.slice(0, 3).join(' '), { expires: '1Y' });
+        const expire = addDays(new Date(),365);
+        setCookie('SavedUsernames', usernames.slice(0, 3).join(' '), { expires: expire})
     }
 }
 
 function clearSavedUsernames() {
-    this.$cookie.delete('SavedUsernames');
+    removeCookie('SavedUsernames')
     setSavedUsernames([]);
 }
-
 
   return (
     <div className="focusBox">
@@ -109,6 +165,7 @@ function clearSavedUsernames() {
           <label className="field_label" htmlFor={getId('username')}>Email</label>
           <input
             className="field_element field_element-fullWidth signIn_username"
+            ref={usernameEl}
             value={username}
             type="text"
             placeholder="you@example.com"
@@ -126,6 +183,7 @@ function clearSavedUsernames() {
             <input
               className="field_element field_element-fullWidth signIn_password"
               id={getId('password')}
+              ref={passwordEl}
               type="password"
               placeholder="****** / 123..."
               value={password}
@@ -143,7 +201,7 @@ function clearSavedUsernames() {
               checked={trustThisDevice}
               onChange={e=> setTrustThisDevice(e.target.checked)}
             />
-            <label className="field_label">Trust this device</label>
+            <label className="field_label"> Trust this device</label>
           </div>
 
           <div className="fields fields-flexSpaceBetween form_row">
@@ -183,7 +241,7 @@ function clearSavedUsernames() {
           {savedUsernames.map((username, index) => {
             return (
               <div className="field form_row">
-                <button className="savedUsernames_username field_element field_element-fullWidth field_element-tall">
+                <button className="savedUsernames_username field_element field_element-fullWidth field_element-tall" onClick={()=> selectUsername(username)}>
                   {username}
                 </button>
               </div>
@@ -191,9 +249,9 @@ function clearSavedUsernames() {
           })}
         </div>
         <div className="savedUsernames_footer">
-          <a href="#" className="savedUsernames_clearUsernames">
+          <button className="savedUsernames_clearUsernames link" onClick={()=> clearSavedUsernames()}>
             Clear saved usernames
-          </a>
+          </button>
         </div>
       </section>
       )}
