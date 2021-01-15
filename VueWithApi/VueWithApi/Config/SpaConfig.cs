@@ -1,18 +1,15 @@
 ﻿namespace VueWithApi.Config
 {
-    public class SpaConfig
+    public static class SpaConfig
     {
         public static ISpaConfig GetConfig(AppConfig appConfig)
         {
-            switch (appConfig.FrontEnd)
+            return appConfig.FrontEnd switch
             {
-                case FrontEndType.React:
-                    return new ReactSpaConfig();
-                case FrontEndType.VueJS:
-                    return new VueSpaConfig();
-                default:
-                    return new VueSpaConfig();
-            }
+                FrontEndType.React => new ReactSpaConfig(),
+                FrontEndType.VueJS => new VueSpaConfig(),
+                _ => new VueSpaConfig()
+            };
         }
     }
 }

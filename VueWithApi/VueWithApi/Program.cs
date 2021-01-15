@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace VueWithApi
 {
-    public class Program
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public static class Program
     {
         public static void Main(string[] args)
         {

@@ -274,3 +274,14 @@ VueWithApi/VueWithApi/wwwroot/build
 /VueWithApi/VueWithApi/ClientApp/src/api/generated/.openapi-generator-ignore
 /VueWithApi/VueWithApi/ClientApp/src/api/generated/git_push.sh
 /VueWithApi/VueWithApi/ClientApp/.eslintcache
+/VueWithApi/VueWithApi/ClientApp_React/src/api/generated/.gitignore
+/VueWithApi/VueWithApi/ClientApp_React/src/api/generated/.npmignore
+/VueWithApi/VueWithApi/ClientApp_React/src/api/generated/.openapi-generator/FILES
+/VueWithApi/VueWithApi/ClientApp_React/src/api/generated/.openapi-generator/VERSION
+/VueWithApi/VueWithApi/ClientApp_React/src/api/generated/.openapi-generator-ignore
+/VueWithApi/VueWithApi/ClientApp_Vue/src/main.js
+/VueWithApi/VueWithApi/ClientApp_Vue/src/main.js.map
+/VueWithApi/VueWithApi/ClientApp_Vue/src/router.js
+/VueWithApi/VueWithApi/ClientApp_Vue/src/router.js.map
+/VueWithApi/VueWithApi/ClientApp_Vue/src/store.js
+/VueWithApi/VueWithApi/ClientApp_Vue/src/store.js.map

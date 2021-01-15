@@ -8,7 +8,6 @@ namespace VueWithApi.CommandLine
 {
     public static class Arguments
     {
-
         public static bool TryGetOptions(string[] args, bool inConsole, out string mode, out ushort port, out bool https)
         {
             var arguments = Parse(args);
@@ -56,17 +55,15 @@ namespace VueWithApi.CommandLine
                 Console.WriteLine("  HTTPS (Defaults to false)");
                 Console.WriteLine("     -https -> Uses HTTPS");
                 Console.WriteLine();
-
             }
 
             return validArgs;
-
         }
 
         public static StringDictionary Parse(string[] args)
         {
             var parameters = new StringDictionary();
-            Regex splitter = new Regex(@"^-{1,2}|^/|=|:",
+            Regex splitter = new Regex("^-{1,2}|^/|=|:",
                 RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
             Regex remover = new Regex(@"^['""]?(.*?)['""]?$",

@@ -1,11 +1,5 @@
-﻿namespace VueWithApi
+﻿namespace VueWithApi.Config
 {
-    public enum FrontEndType
-    {
-        VueJS,
-        React
-    }
-
     public class AppConfig
     {
         public FrontEndType FrontEnd { get; set; } = FrontEndType.VueJS;

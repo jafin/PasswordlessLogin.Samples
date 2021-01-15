@@ -18,16 +18,15 @@ namespace VueWithApi.Controllers
         public async Task<IActionResult> SignInLink(string longCode)
         {
             var response = await _authenticateOrchestrator.AuthenticateLongCodeAsync(longCode).ConfigureAwait(false);
-            switch (response.StatusCode)
+            return response.StatusCode switch
             {
-                case HttpStatusCode.Redirect:
-                    return Redirect(response.RedirectUrl);
-                case HttpStatusCode.NotFound:
-                    return NotFound();
-                case HttpStatusCode.Unauthorized:
-                default:                    
-                    return Redirect("/signin"); // todo: pass response.Message along to be displayed to the user
-            }
+                HttpStatusCode.Redirect => Redirect(response.RedirectUrl),
+                HttpStatusCode.NotFound => NotFound(),
+                HttpStatusCode.Unauthorized =>
+                    Redirect("/signin") // todo: pass response.Message along to be displayed to the user
+                ,
+                _ => Redirect("/signin")
+            };
         }
     }
 }

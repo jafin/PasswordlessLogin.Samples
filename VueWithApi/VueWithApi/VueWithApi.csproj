@@ -13,8 +13,6 @@
     <Content Remove="ClientApp\**" />
     <EmbeddedResource Remove="ClientAppVue\**" />
     <EmbeddedResource Remove="ClientApp\**" />
-    <None Remove="ClientAppVue\**" />
-    <None Remove="ClientApp\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,21 +31,11 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.1.11" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.11" />
     <PackageReference Include="Microsoft.NET.Sdk.Razor" Version="3.1.11" />
+    <PackageReference Include="SimpleIAM.PasswordlessLogin.API" Version="0.6.1-alpha0017" />
+    <PackageReference Include="SimpleIAM.PasswordlessLogin.SqlServer" Version="0.6.1-alpha0017" />
     <PackageReference Include="StandardResponse" Version="0.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     <PackageReference Include="VueCliMiddleware" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="SimpleIAM.PasswordlessLogin">
-      <HintPath>lib\SimpleIAM.PasswordlessLogin.dll</HintPath>
-    </Reference>
-    <Reference Include="SimpleIAM.PasswordlessLogin.API">
-      <HintPath>lib\SimpleIAM.PasswordlessLogin.API.dll</HintPath>
-    </Reference>
-    <Reference Include="SimpleIAM.PasswordlessLogin.SqlServer">
-      <HintPath>lib\SimpleIAM.PasswordlessLogin.SqlServer.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

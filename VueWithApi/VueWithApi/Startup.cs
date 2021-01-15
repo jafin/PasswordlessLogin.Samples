@@ -16,7 +16,7 @@ namespace VueWithApi
     public class Startup
     {
         private readonly IWebHostEnvironment _env;
-        private string _CORSPolicy = "DevPolicy";
+        private readonly string _CORSPolicy = "DevPolicy";
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
@@ -36,32 +36,33 @@ namespace VueWithApi
             builder.AddSmtpEmail(Configuration);
             builder.AddAuth();
 
-            services.AddCors(options =>
+            if (_env.IsDevelopment())
             {
-                options.AddPolicy(_CORSPolicy,
-                    builder =>
-                    {
-                        builder.WithOrigins("http://localhost",
-                                "https://localhost",
-                                "https://localhost:3000",
-                                "http://localhost:3000"
-                            ).AllowCredentials() //allow sending auth cookies cross origin (assist in dev proxy mode)
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    });
-            });
+                services.AddCors(options =>
+                {
+                    options.AddPolicy(_CORSPolicy,
+                        builder =>
+                        {
+                            builder.WithOrigins("http://localhost",
+                                    "https://localhost"
+                                ).AllowCredentials() //allow sending auth cookies cross origin (assist in dev proxy mode)
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                        });
+                });
+            }
 
             var connection =
                 Configuration.GetConnectionString(PasswordlessLoginConstants.ConfigurationSections
                     .ConnectionStringName);
-            builder.AddSqlServer(options => { options.UseSqlServer(connection); });
+            builder.AddSqlServer(options => options.UseSqlServer(connection));
 
             services.AddMvc(options => options.EnableEndpointRouting = false)
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             if (_env.IsDevelopment())
             {
-                services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "API", Version = "v1"}); });
+                services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo {Title = "API", Version = "v1"}));
             }
         }
 
@@ -105,7 +106,7 @@ namespace VueWithApi
                     }
 
                     app.UseSwagger();
-                    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1"); });
+                    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1"));
                 }
                 else
                 {
@@ -114,7 +115,7 @@ namespace VueWithApi
             });
 
             //app.UseHttpsRedirection();
-            app.UseSpa(spa => { spa.Options.SourcePath = spaConfig.SourcePath; });
+            app.UseSpa(spa => spa.Options.SourcePath = spaConfig.SourcePath);
         }
     }
 }
