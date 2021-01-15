@@ -7,10 +7,17 @@ import api from './api/api';
      initialized: boolean,
      minimumPasswordStrength: number,
      minimumPasswordLength: number,
-     user: object|null,
+     user: User,
      permissions: any|null,
-     fatalError():void
-     initialize():void
+     fatalError():void,
+     initialize():Promise<void>,
+     signedIn():boolean
+ }
+
+ type User = {
+     username: string,
+     email: string,
+     isAuthenticated: boolean
  }
 
 export const useStore = create<State>((set,get) => ({
@@ -22,22 +29,34 @@ export const useStore = create<State>((set,get) => ({
     initialized: false,
     minimumPasswordStrength: 0,
     minimumPasswordLength: 0,
-    user: null,
+    user: {
+        username: '?',
+        email: '?',
+        isAuthenticated: false
+    },
     permissions: null,
+    signedIn: ()=> {
+        const user = get().user;
+        return typeof (user.isAuthenticated) !== 'undefined' && user.isAuthenticated === true? true: false;
+    },
     fatalError: ()=> {
         set(state => ({ initializationFailed: true }));
     },
+
     initialize: () => {
         return new Promise<void>((resolve, reject): void => {
             api.getAppInfo().then(data => {
-                //context.commit('setAppInfo', data);
+                console.log('initialize...',data);
                 set(state => ({
                     initialized: true,
                     minimumPasswordStrength: data.minimumPasswordStrength,
                     minimumPasswordLength: data.minimumPasswordLength,
-                    user: data.user,
+                    user: data.user as User,
                     permissions: data.permissions
                 }));
+                console.log('end init');
+                console.log('isInitialized:',get().initialized);
+                console.log('user:',get().user);
                 resolve();
             }).catch(err => {
                 console.log(err);

@@ -8,7 +8,7 @@ export function Home() {
       api
         .tryToGetProtectedInfoButDontRedirectIfUnauthenticated()
         .then((data) => {
-          setMessage(data);
+          setMessage(data.message);
         })
         .catch((err) => {
           if (

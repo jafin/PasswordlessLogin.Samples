@@ -8,7 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using SimpleIAM.PasswordlessLogin;
-//using VueCliMiddleware;
+using VueCliMiddleware;
+using VueWithApi.Config;
 
 namespace VueWithApi
 {
@@ -30,16 +31,9 @@ namespace VueWithApi
         {
             // If you need to customize the functionality of the Passwordless module
             // you can register custom services for sending mail, hashing password, etc. here
-            var builder = services.AddPasswordlessLogin();
+            var builder = services.AddPasswordlessLogin(Configuration);
             builder.AddPasswordlessLoginAPI();
-            builder.AddSmtpEmail(options =>
-            {
-                options.Port = 25;
-                options.Server = "localhost";
-                options.UseSsl = false;
-                options.UseAuthentication = false;
-            });
-
+            builder.AddSmtpEmail(Configuration);
             builder.AddAuth();
 
             services.AddCors(options =>
@@ -48,9 +42,9 @@ namespace VueWithApi
                     builder =>
                     {
                         builder.WithOrigins("http://localhost",
-                            "https://localhost",
-                            "https://localhost:3000",
-                            "http://localhost:3000"
+                                "https://localhost",
+                                "https://localhost:3000",
+                                "http://localhost:3000"
                             ).AllowCredentials() //allow sending auth cookies cross origin (assist in dev proxy mode)
                             .AllowAnyHeader()
                             .AllowAnyMethod();
@@ -74,7 +68,9 @@ namespace VueWithApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            const bool useVue = false;
+            var appConfig = new AppConfig();
+            Configuration.GetSection("App").Bind(appConfig);
+            var spaConfig = SpaConfig.GetConfig(appConfig);
 
             if (!env.IsDevelopment())
             {
@@ -98,16 +94,14 @@ namespace VueWithApi
                 {
                     app.UseDeveloperExceptionPage();
 
-                   
-
                     // This forwards everything to the "vue-cli-service":
-                    if (useVue)
+                    if (spaConfig.FrontEnd == FrontEndType.VueJS)
                     {
-                        // endpoints.MapToVueCliProxy(
-                        //     "{*path}",
-                        //     new SpaOptions {SourcePath = "ClientApp"},
-                        //     npmScript: "serve",
-                        //     regex: "Compiled successfully");
+                        endpoints.MapToVueCliProxy(
+                            "{*path}",
+                            new SpaOptions {SourcePath = spaConfig.SourcePath},
+                            npmScript: "serve",
+                            regex: "Compiled successfully");
                     }
 
                     app.UseSwagger();
@@ -119,10 +113,8 @@ namespace VueWithApi
                 }
             });
 
-
             //app.UseHttpsRedirection();
-
-            app.UseSpa(spa => { spa.Options.SourcePath = "ClientApp"; });
+            app.UseSpa(spa => { spa.Options.SourcePath = spaConfig.SourcePath; });
         }
     }
 }

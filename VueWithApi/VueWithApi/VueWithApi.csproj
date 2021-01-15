@@ -6,22 +6,36 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>98143ccc-e714-45e0-b310-db1fc5a8f09d</UserSecretsId>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="ClientAppVue\**" />
+    <Compile Remove="ClientApp\**" />
+    <Content Remove="ClientAppVue\**" />
+    <Content Remove="ClientApp\**" />
+    <EmbeddedResource Remove="ClientAppVue\**" />
+    <EmbeddedResource Remove="ClientApp\**" />
+    <None Remove="ClientAppVue\**" />
+    <None Remove="ClientApp\**" />
+  </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ClientAppVue\public\" />
-    <Folder Include="ClientApp\app\" />
     <Folder Include="Views\Home\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.1.10" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.1.11" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />
-    <PackageReference Include="Microsoft.NET.Sdk.Razor" Version="3.1.10" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.11" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.11" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.11" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.1.11" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.11" />
+    <PackageReference Include="Microsoft.NET.Sdk.Razor" Version="3.1.11" />
     <PackageReference Include="StandardResponse" Version="0.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="VueCliMiddleware" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>

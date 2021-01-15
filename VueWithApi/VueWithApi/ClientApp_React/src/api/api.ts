@@ -9,7 +9,7 @@ const url = axios.create({
 });
 
 const api = {
-    getAppInfo():Promise<AppInfo> {
+    getAppInfo(): Promise<AppInfo> {
         return this.enhancePromise<AppInfo>(url.get('/api/app-info'));
     },
     getProtectedInfo() {
@@ -24,13 +24,18 @@ const api = {
     sendOneTimeCode(username: string, nextUrl: any) {
         return this.enhancePromise(url.post('/passwordless-api/v1/send-one-time-code', { username, nextUrl }));
     },
-    
+
     authenticate(username: string, oneTimeCode: string, staySignedIn: boolean) {
         return this.enhancePromise(url.post('/passwordless-api/v1/authenticate', { username, oneTimeCode, staySignedIn }), false);
     },
 
     authenticateOneTimeCode(username: string, oneTimeCode: string, staySignedIn: boolean) {
         return this.enhancePromise(url.post('/passwordless-api/v1/authenticate-one-time-code', { username, oneTimeCode, staySignedIn }), false);
+    },
+
+    authenticateLongCode(longCode: string):Promise<unknown> {
+        console.log('authenticateLongCode');
+        return this.enhancePromise(url.post('/passwordless-api/v1/authenticate-long-code', { longCode: longCode }), false);
     },
 
     authenticatePassword(username: string, password: string, staySignedIn: boolean, nextUrl: any) {

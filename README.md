@@ -21,13 +21,13 @@ https://raw.githubusercontent.com/SimpleIAM/PasswordlessLogin/master/Passwordles
 
 ### Email
 
-Download and run [MailHog](https://github.com/mailhog/MailHog/releases/v1.0.0) or [SMTP4Dev](https://github.com/rnwood/smtp4dev/releases/latest) (on your local dev machine, or you can override the SMTP settings in appsettings.Development.json with another mail server in secrets.json. If using MailHog, you can check mail at http://localhost:8025/
+Download and run [MailHog](https://github.com/mailhog/MailHog/releases/v1.0.0) or [SMTP4Dev](https://github.com/rnwood/smtp4dev/releases/latest) (on your local dev machine, or you can override the SMTP settings in `appsettings.Development.json` with another mail server in `secrets.json`. If using MailHog, you can check mail at http://localhost:8025/
 
 ### Debugging
 
 The authentication system requires certain security cookies that must be set over a secure connection. If running locally under IIS Express and ssl is not enabled, you won't be able to sign in. So either set up SSL in IIS express, or follow the instructions below to use Kestrel.
 
-To use the Kestrel server with SSL, edit launchSettings.json (nested under Properties in the Solution Explorer). Add a Kestrel entry to the profiles section:
+To use the Kestrel server with SSL, edit `launchSettings.json` (nested under Properties in the Solution Explorer). Add a Kestrel entry to the profiles section:
 
 ```json
 {
@@ -56,6 +56,54 @@ Next to the green arrow that launches a new debug session, select the new launch
 
 Some projects have SwaggerUI embedded in the app. You can visit /swagger/ to explore and interact with the API.
 
+### React Front End
+
+By default the example will launch with a VUE SPA.  As an alternative there is also a React SPA, it should almost be feature parity with the VUE client.
+
+If you would like to run the React SPA do here are some notes:
+
+Edit the `appsettings.json`  and set the frontend:
+
+```json
+"App" {
+  "FrontEnd" : "React"
+}
+```
+
+Start the backend up.
+Note the React SPA is started n a separate port, to isolate it from the backend.
+So the backend will run on 5000/5001.  And the frontend on 3000.  To run the frontend shell out to ClientApp_React
+
+```shell
+npm i
+npm start
+```
+
+Launch a browser to https://localhost:3000/ to access the frontend.
+
+To avoid the certificate SSL warnings, you can generate a local dev certificate.
+There is an example script for windows, `create-cert.ps1`  It requires [chocolatey](https://chocolatey.org/) to be installed.  Run from an elevated PowerShell prompt.
+
+```powershell
+create-cert.ps1
+```
+
+To run the frontend not in SSL:
+Edit the .env.development file:
+
+```txt
+HTTPS=false
+```
+
+In the appsettings.json, you may need to set cookieSameSite to none, since traversing from http to https will triggers CORS.
+
+```json
+{
+...
+"CookieSameSiteMode": "None"
+}
+```
+
 ### Other Notes
 
 If things aren't working, make sure you have these installed:
@@ -67,4 +115,4 @@ If things aren't working, make sure you have these installed:
 
 * Make sure the "DefaultConnection" connection string is set
 * If targeting an environment other than Production, add an app setting for ASPNETCORE_ENVIRONMENT and set it to "Test" or whichever environment is appropriate.
-* Make sure SMTP settings are configured in appsettings.Production.json or in Azure app settings. In Azure keys will be _Mail:From_, _Mail:Smtp:Password_, and so forth.
+* Make sure SMTP settings are configured in `appsettings.Production.json` or in Azure app settings. In Azure keys will be _Mail:From_, _Mail:Smtp:Password_, and so forth.
