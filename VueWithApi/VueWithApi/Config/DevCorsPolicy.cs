@@ -12,7 +12,8 @@ namespace VueWithApi.Config
                     builder =>
                     {
                         builder.WithOrigins("http://localhost",
-                                "https://localhost"
+                                "https://localhost",
+                                "https://localhost:3000"
                             ).AllowCredentials() //allow sending auth cookies cross origin (assist in dev proxy mode)
                             .AllowAnyHeader()
                             .AllowAnyMethod();
