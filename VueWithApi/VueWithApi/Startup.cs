@@ -16,7 +16,7 @@ namespace VueWithApi
     public class Startup
     {
         private readonly IWebHostEnvironment _env;
-        private readonly string _CORSPolicy = "DevPolicy";
+        private readonly string _devCORSPolicy = "DevPolicy";
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
@@ -38,18 +38,7 @@ namespace VueWithApi
 
             if (_env.IsDevelopment())
             {
-                services.AddCors(options =>
-                {
-                    options.AddPolicy(_CORSPolicy,
-                        builder =>
-                        {
-                            builder.WithOrigins("http://localhost",
-                                    "https://localhost"
-                                ).AllowCredentials() //allow sending auth cookies cross origin (assist in dev proxy mode)
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
-                        });
-                });
+                services.AddDevCorsPolicy(_devCORSPolicy);
             }
 
             var connection =
@@ -78,7 +67,7 @@ namespace VueWithApi
                 app.UseSpaStaticFiles();
             }
 
-            app.UseCors(_CORSPolicy);
+            app.UseCors(_devCORSPolicy);
 
             app.UsePasswordlessLoginAPI(env.WebRootFileProvider);
             app.UsePasswordlessLogin(env
