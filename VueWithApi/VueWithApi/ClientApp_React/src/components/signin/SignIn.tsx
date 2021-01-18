@@ -4,14 +4,13 @@ import api from "../../api/api";
 import { Link, useHistory, useParams } from "react-router-dom";
 import { useCookies } from "react-cookie";
 import { useStore } from "../../store";
-import { resolve } from "path";
 
 type RouteParams = {
   longCode?: string;
 };
 
-export function SignIn() {
-  let { longCode } = useParams<RouteParams>();
+export function SignIn():JSX.Element {
+  const { longCode } = useParams<RouteParams>();
 
   const [passwordError, setPasswordError] = useState("");
   const [message, setMessage] = useState("");
@@ -21,7 +20,7 @@ export function SignIn() {
   const [trustThisDevice, setTrustThisDevice] = useState<boolean>(false);
   const [signInEnabled, setSignInEnabled] = useState<boolean>(true);
   const [signInType, setSignInType] = useState<string>("");
-  let history = useHistory();
+  const history = useHistory();
   const store = useStore();
   const [cookies, setCookie, removeCookie] = useCookies(["name"]);
 
@@ -59,7 +58,7 @@ export function SignIn() {
           signInFailed(error)
         });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Xeslint-disable-next-line react-hooks/exhaustive-deps
   }, [longCode]);
 
   useEffect(() => {
@@ -70,7 +69,7 @@ export function SignIn() {
     } else {
       usernameEl.current.focus();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Xeslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const submitForm = function (evt: React.FormEvent<HTMLFormElement>): void {
@@ -132,7 +131,7 @@ export function SignIn() {
 
   const signIn = function () {
     if (signInEnabled) {
-      let oneTimeCode = password.replace(" ", "");
+      const oneTimeCode = password.replace(" ", "");
       if (signInType === "code" || /^[0-9]{6}$/.test(oneTimeCode)) {
         api
           .authenticateOneTimeCode(username, oneTimeCode, trustThisDevice)
@@ -173,7 +172,7 @@ export function SignIn() {
 
   function saveUsernames() {
     if (trustThisDevice) {
-      let usernames = savedUsernames.filter(
+      const usernames = savedUsernames.filter(
         (name) => name.toLowerCase() !== username.toLowerCase(),
       );
       if (username.length <= 100) {
