@@ -5,14 +5,13 @@ import { BrowserRouter as Router, Link } from "react-router-dom";
 import { useStore } from "./store";
 import { Routes } from "./Routes";
 
-function App() {
+function App():JSX.Element {
   const store = useStore();
   const user = useStore((state) => state.user);
   const isSignedIn = useStore((state) => state.signedIn());
 
   useEffect(() => {
     store.initialize();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

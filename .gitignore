@@ -285,3 +285,4 @@ VueWithApi/VueWithApi/wwwroot/build
 /VueWithApi/VueWithApi/ClientApp_Vue/src/router.js.map
 /VueWithApi/VueWithApi/ClientApp_Vue/src/store.js
 /VueWithApi/VueWithApi/ClientApp_Vue/src/store.js.map
+.eslintcache
